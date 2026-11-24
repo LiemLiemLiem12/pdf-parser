@@ -1,0 +1,6 @@
+# Install only for Phase P4 evaluation work.
+pandas>=2.2,<3.0
+scikit-learn>=1.6,<2.0
+# Optional metrics should be installed only when used:
+# rouge-score
+# bert-score
