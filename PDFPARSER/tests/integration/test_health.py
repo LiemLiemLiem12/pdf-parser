@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 
 from app.core.config import Settings
 from app.main import create_app
+from app.services.llm_service import MockLLMService
 
 
 class LoadedModelManager:
@@ -76,18 +77,24 @@ def test_loaded_manager_is_created_once_and_released_by_lifespan() -> None:
         quantization="nf4-4bit",
     )
     manager = LoadedModelManager()
-    app = create_app(settings, model_manager=manager)  # type: ignore[arg-type]
+    app = create_app(
+        settings,
+        model_manager=manager,  # type: ignore[arg-type]
+        generator=MockLLMService(),
+    )
 
     with TestClient(app, raise_server_exceptions=False) as client:
         first = client.get("/api/v1/ready")
         second = client.get("/api/v1/ready")
         assert app.state.runtime.model_metadata == manager.metadata
 
-    assert first.status_code == 503
-    assert second.status_code == 503
-    assert first.json()["error"]["message"] == (
-        "Model loaded; Transformers generation is pending RP-012"
-    )
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert first.json() == {
+        "status": "ready",
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "inference_mode": "transformers",
+    }
     assert manager.load_calls == 1
     assert manager.close_calls == 1
 

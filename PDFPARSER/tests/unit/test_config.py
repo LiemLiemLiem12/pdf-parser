@@ -33,6 +33,18 @@ def test_transformers_mode_resolves_known_model() -> None:
     assert settings.resolved_model_id == "Qwen/Qwen2.5-14B-Instruct"
 
 
+def test_generation_budget_must_fit_inside_context_window() -> None:
+    with pytest.raises(
+        ValidationError,
+        match="MAX_NEW_TOKENS must be less than CONTEXT_WINDOW_TOKENS",
+    ):
+        Settings(
+            _env_file=None,
+            context_window_tokens=1_536,
+            max_new_tokens=1_536,
+        )
+
+
 def test_retry_cap_cannot_exceed_one() -> None:
     with pytest.raises(ValidationError):
         Settings(_env_file=None, retry_cap=2)

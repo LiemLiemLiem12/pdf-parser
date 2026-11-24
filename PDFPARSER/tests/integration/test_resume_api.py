@@ -69,6 +69,37 @@ def test_parse_text_uses_bounded_retry_and_maps_model_failure() -> None:
     }
 
 
+def test_parse_text_maps_context_overflow_to_422_without_retry() -> None:
+    generator = SequenceGenerator(
+        [
+            GenerationResult(
+                raw_text="",
+                completion_status=CompletionStatus.FAILED,
+                error_code="CONTEXT_LIMIT_EXCEEDED",
+            )
+        ]
+    )
+    app = create_app(Settings(_env_file=None), generator=generator)
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/v1/resumes/parse-text",
+            json={"text": "Synthetic CV"},
+            headers={"X-Request-ID": "req_context"},
+        )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        "request_id": "req_context",
+        "status": "error",
+        "error": {
+            "code": "CONTEXT_LIMIT_EXCEEDED",
+            "message": "Resume prompt exceeds the model context limit",
+        },
+    }
+    assert len(generator.calls) == 1
+
+
 @pytest.mark.parametrize("payload", [{}, {"text": ""}, {"text": 123}, {"text": "ok", "extra": 1}])
 def test_parse_text_rejects_invalid_request_contract(payload: dict[str, object]) -> None:
     app = create_app(Settings(_env_file=None))

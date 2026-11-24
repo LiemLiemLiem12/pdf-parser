@@ -30,6 +30,8 @@ class GenerationResult:
     input_tokens: int | None = None
     output_tokens: int | None = None
     generation_ms: float | None = None
+    peak_allocated_vram_bytes: int | None = None
+    peak_reserved_vram_bytes: int | None = None
     error_code: str | None = None
     error_message: str | None = None
 

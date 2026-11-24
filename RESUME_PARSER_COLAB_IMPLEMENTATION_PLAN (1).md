@@ -516,15 +516,15 @@ The snippet is not a complete Model Manager. Production of an experimental run r
 **Depends on:** RP-011, RP-005.  
 **Files:** `services/llm_service.py`, `llm/contracts.py`, generation tests.
 
-- [ ] Apply the model-native chat template with `add_generation_prompt=True` and tokenize messages without accidentally duplicating special tokens.
-- [ ] Check token count, including prompt and schema, before inference. Reserve `max_new_tokens` inside the configured context budget; never silently truncate a resume.
-- [ ] Start with a conservative total context cap (e.g., 4096 tokens) and max output (e.g., 1024–1536 tokens), then adjust using the development set and measured resource limits. These are initial choices, not guaranteed capacities.
-- [ ] Run `model.generate()` inside `torch.inference_mode()` with `do_sample=False` for the initial deterministic baseline; do not pass incompatible sampling-only parameters. Record all decoding options.
-- [ ] Move inputs to the model's actual input device. Decode only tokens generated after the prompt, using `skip_special_tokens=True`.
-- [ ] Capture EOS/stop or token-limit completion status. Do not report truncated JSON as success.
-- [ ] Serialize model generation with a process-level mutex/semaphore of capacity one; no multi-worker model duplication.
-- [ ] Measure generation time, input/output token counts and peak allocated/reserved CUDA memory. Synchronize CUDA when measuring GPU timing as appropriate.
-- [ ] Translate OOM and inference failures into typed application errors; avoid repeated automatic generation under memory pressure.
+- [x] Apply the model-native chat template with `add_generation_prompt=True` and tokenize messages without accidentally duplicating special tokens.
+- [x] Check token count, including prompt and schema, before inference. Reserve `max_new_tokens` inside the configured context budget; never silently truncate a resume.
+- [x] Start with a conservative total context cap (e.g., 4096 tokens) and max output (e.g., 1024–1536 tokens), then adjust using the development set and measured resource limits. These are initial choices, not guaranteed capacities.
+- [x] Run `model.generate()` inside `torch.inference_mode()` with `do_sample=False` for the initial deterministic baseline; do not pass incompatible sampling-only parameters. Record all decoding options.
+- [x] Move inputs to the model's actual input device. Decode only tokens generated after the prompt, using `skip_special_tokens=True`.
+- [x] Capture EOS/stop or token-limit completion status. Do not report truncated JSON as success.
+- [x] Serialize model generation with a process-level mutex/semaphore of capacity one; no multi-worker model duplication.
+- [x] Measure generation time, input/output token counts and peak allocated/reserved CUDA memory. Synchronize CUDA when measuring GPU timing as appropriate.
+- [x] Translate OOM and inference failures into typed application errors; avoid repeated automatic generation under memory pressure.
 
 **Generation flow:**
 
@@ -792,8 +792,8 @@ Example prediction fields: `sample_id`, `status`, `model_id`, `schema_version`, 
 | RP-008 | FastAPI Controller | [x] Completed; locally verified |
 | RP-009 | Mock end-to-end verification | [ ] Local verification complete; fresh Colab run pending |
 | RP-010 | Colab environment preflight | [x] Passed on a Colab GPU runtime (user-confirmed 2026-11-24) |
-| RP-011 | Model Manager | [ ] Implemented and locally tested; actual Colab checkpoint load pending |
-| RP-012 | Transformers LLM Service | [ ] Planned |
+| RP-011 | Model Manager | [x] Qwen 7B NF4 load passed on Colab (user-confirmed 2026-11-24) |
+| RP-012 | Transformers LLM Service | [ ] Implemented and locally tested; real Colab generation pending |
 | RP-013 | Real LLM end-to-end extraction | [ ] Planned |
 | RP-014 | Dataset and annotations | [ ] Planned |
 | RP-015 | Evaluation metrics | [ ] Planned |

@@ -2,7 +2,11 @@ import json
 
 import pytest
 
-from app.core.exceptions import GenerationFailedError, InvalidModelOutputError
+from app.core.exceptions import (
+    ContextLimitExceededError,
+    GenerationFailedError,
+    InvalidModelOutputError,
+)
 from app.llm.contracts import CompletionStatus, GenerationResult
 from app.services.llm_service import MockLLMService
 from app.services.parsing_service import ParsingService
@@ -93,3 +97,20 @@ def test_second_attempt_failure_preserves_first_attempt_status() -> None:
         "attempt_count": 2,
         "first_attempt_status": "invalid_json",
     }
+
+
+def test_context_limit_failure_maps_to_typed_error_without_retry() -> None:
+    generator = SequenceGenerator(
+        [
+            GenerationResult(
+                raw_text="",
+                completion_status=CompletionStatus.FAILED,
+                error_code="CONTEXT_LIMIT_EXCEEDED",
+            )
+        ]
+    )
+
+    with pytest.raises(ContextLimitExceededError):
+        ParsingService(generator).parse("Synthetic resume")
+
+    assert len(generator.calls) == 1

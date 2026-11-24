@@ -57,7 +57,8 @@ class Settings(BaseSettings):
     quantization: str = "none"
 
     input_max_chars: PositiveInt = 50_000
-    max_new_tokens: PositiveInt = 2_048
+    context_window_tokens: PositiveInt = 4_096
+    max_new_tokens: PositiveInt = 1_536
     retry_cap: RetryCount = 1
     max_file_size_bytes: PositiveInt = 10 * 1024 * 1024
     max_pdf_pages: PositiveInt = 30
@@ -82,8 +83,8 @@ class Settings(BaseSettings):
             raise ValueError("MODEL_REVISION must not be blank")
         if not self.request_id_header.strip():
             raise ValueError("REQUEST_ID_HEADER must not be blank")
-        if self.input_max_chars < self.max_new_tokens:
-            raise ValueError("INPUT_MAX_CHARS must be greater than or equal to MAX_NEW_TOKENS")
+        if self.max_new_tokens >= self.context_window_tokens:
+            raise ValueError("MAX_NEW_TOKENS must be less than CONTEXT_WINDOW_TOKENS")
         return self
 
     @property

@@ -1,6 +1,7 @@
 """Orchestrate prompt construction, generation, parsing and validation."""
 
 from app.core.exceptions import (
+    ContextLimitExceededError,
     GenerationFailedError,
     InvalidInputError,
     InvalidModelOutputError,
@@ -54,8 +55,10 @@ class ParsingService:
             generation = self._generate(messages, attempt_count, first_attempt_status)
 
             if generation.completion_status is CompletionStatus.FAILED:
+                if generation.error_code == "CONTEXT_LIMIT_EXCEEDED":
+                    raise ContextLimitExceededError()
                 raise GenerationFailedError(
-                    "Model generation failed",
+                    generation.error_message or "Model generation failed",
                     code=generation.error_code or "GENERATION_FAILED",
                     context={
                         "attempt_count": attempt_count,
@@ -115,6 +118,12 @@ class ParsingService:
                         input_tokens=generation.input_tokens,
                         output_tokens=generation.output_tokens,
                         generation_ms=generation.generation_ms,
+                        peak_allocated_vram_bytes=(
+                            generation.peak_allocated_vram_bytes
+                        ),
+                        peak_reserved_vram_bytes=(
+                            generation.peak_reserved_vram_bytes
+                        ),
                         completion_status=generation.completion_status.value,
                     ),
                 ),

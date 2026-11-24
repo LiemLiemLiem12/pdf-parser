@@ -33,7 +33,7 @@ _FILE_ERROR_RESPONSES = {
 }
 _TEXT_ERROR_RESPONSES = {
     400: {"model": ErrorResponse, "description": "Invalid resume text"},
-    422: {"model": ErrorResponse, "description": "Invalid request body"},
+    422: {"model": ErrorResponse, "description": "Invalid request or context limit"},
     502: {"model": ErrorResponse, "description": "Model generation or output failure"},
     503: {"model": ErrorResponse, "description": "Parser is not ready"},
 }

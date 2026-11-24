@@ -132,3 +132,12 @@ class GenerationFailedError(AppError):
             status_code=HTTPStatus.BAD_GATEWAY,
             context=context or {},
         )
+
+
+class ContextLimitExceededError(AppError):
+    def __init__(self, message: str = "Resume prompt exceeds the model context limit") -> None:
+        super().__init__(
+            code="CONTEXT_LIMIT_EXCEEDED",
+            message=message,
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+        )

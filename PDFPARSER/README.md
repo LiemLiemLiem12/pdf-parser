@@ -2,18 +2,19 @@
 
 This project follows `../RESUME_PARSER_COLAB_IMPLEMENTATION_PLAN (1).md`. The
 current implementation covers **Phase P0 through P2 (RP-001 through RP-009)**
-and the **RP-011 Model Manager**:
+and **RP-011 through RP-012**:
 project foundation, configuration, lifecycle, strict resume schemas, versioned
 prompts, model-independent generation contracts, deterministic mock generation,
 strict output processing, validation, bounded retry, bounded PDF/DOCX text
-extraction, HTTP parsing endpoints, and CPU-only tests.
-The RP-010 preflight has been reported as passing on Colab. The actual RP-011
-checkpoint load still needs to be run in that GPU runtime.
+extraction, HTTP parsing endpoints, model lifecycle, deterministic Transformers
+generation, context budgeting, serialized GPU access, and CPU-only tests.
+The RP-010 preflight and RP-011 Qwen 7B NF4 load have been reported as passing
+on Colab. RP-013 real end-to-end extraction still needs GPU verification.
 
 Mock inference is the default. Importing `app.main` does not import PyTorch,
 initialize CUDA, download a checkpoint, or read private resume data. Real model
-generation belongs to RP-012; RP-011 now loads and owns the allowlisted model
-and tokenizer lifecycle. PDF extraction uses `pypdf` and DOCX
+generation reuses the model and tokenizer owned by RP-011 and never loads a
+checkpoint per request. PDF extraction uses `pypdf` and DOCX
 extraction uses `python-docx`; OCR and complex layout reconstruction are not
 part of V1.
 
@@ -59,8 +60,9 @@ curl -X POST http://127.0.0.1:8000/api/v1/resumes/parse \
 
 Liveness only confirms that the process is running. Readiness confirms that the
 configured inference implementation is usable. Mock mode is ready immediately;
-transformers mode remains unready until RP-012 connects the loaded manager to
-the real generation service.
+transformers mode becomes ready only after both the model manager and real
+generation service initialize successfully. Run real-model mode with one
+application worker so one process owns the checkpoint and generation lock.
 
 ## Google Colab setup
 
@@ -105,7 +107,7 @@ always-on deployment is part of V1.
 
 Copy `.env.example` to `.env` when environment overrides are needed. Important
 settings include inference/model selection, model revision and quantization,
-input/output caps, retry cap, file/page limits, artifact path and log level.
+character/context/output caps, retry cap, file/page limits, artifact path and log level.
 Invalid combinations fail during application creation.
 
 API errors follow this stable envelope:

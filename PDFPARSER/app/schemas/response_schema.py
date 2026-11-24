@@ -20,6 +20,8 @@ class GenerationMetadata(StrictSchema):
     input_tokens: int | None
     output_tokens: int | None
     generation_ms: float | None
+    peak_allocated_vram_bytes: int | None = None
+    peak_reserved_vram_bytes: int | None = None
     completion_status: Literal["completed", "truncated", "failed"]
 
 

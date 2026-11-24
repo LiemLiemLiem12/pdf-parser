@@ -8,7 +8,7 @@ from app.core.exceptions import ModelNotReadyError
 from app.llm.contracts import Generator
 from app.llm.model_manager import ModelLoadError, ModelManager
 from app.services.document_service import DocumentService
-from app.services.llm_service import MockLLMService
+from app.services.llm_service import MockLLMService, TransformersLLMService
 from app.services.parsing_service import ParsingService
 
 @dataclass(slots=True)
@@ -61,8 +61,27 @@ class RuntimeState:
             return
 
         self.model_metadata = self.model_manager.metadata
-        self.ready = False
-        self.reason = "Model loaded; Transformers generation is pending RP-012"
+        try:
+            self.generator = generator or TransformersLLMService(
+                self.model_manager,
+                context_window_tokens=settings.context_window_tokens,
+                max_new_tokens=settings.max_new_tokens,
+            )
+        except Exception as exc:
+            self.ready = False
+            self.reason = (
+                "Transformers generation service initialization failed "
+                f"({type(exc).__name__})"
+            )
+            return
+
+        self.parsing_service = ParsingService(
+            self.generator,
+            retry_cap=settings.retry_cap,
+            max_input_chars=settings.input_max_chars,
+        )
+        self.ready = True
+        self.reason = "Transformers inference is ready"
 
     def stop(self) -> None:
         if self.model_manager is not None:
