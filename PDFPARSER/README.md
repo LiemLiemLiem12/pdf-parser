@@ -1,16 +1,19 @@
 # Resume Parser (Colab prototype)
 
 This project follows `../RESUME_PARSER_COLAB_IMPLEMENTATION_PLAN (1).md`. The
-current implementation covers **Phase P0 through P2 (RP-001 through RP-009)**:
+current implementation covers **Phase P0 through P2 (RP-001 through RP-009)**
+and the **RP-011 Model Manager**:
 project foundation, configuration, lifecycle, strict resume schemas, versioned
 prompts, model-independent generation contracts, deterministic mock generation,
 strict output processing, validation, bounded retry, bounded PDF/DOCX text
 extraction, HTTP parsing endpoints, and CPU-only tests.
-Fresh-Colab verification remains pending.
+The RP-010 preflight has been reported as passing on Colab. The actual RP-011
+checkpoint load still needs to be run in that GPU runtime.
 
 Mock inference is the default. Importing `app.main` does not import PyTorch,
 initialize CUDA, download a checkpoint, or read private resume data. Real model
-loading belongs to a later reviewed phase. PDF extraction uses `pypdf` and DOCX
+generation belongs to RP-012; RP-011 now loads and owns the allowlisted model
+and tokenizer lifecycle. PDF extraction uses `pypdf` and DOCX
 extraction uses `python-docx`; OCR and complex layout reconstruction are not
 part of V1.
 
@@ -56,7 +59,8 @@ curl -X POST http://127.0.0.1:8000/api/v1/resumes/parse \
 
 Liveness only confirms that the process is running. Readiness confirms that the
 configured inference implementation is usable. Mock mode is ready immediately;
-transformers mode stays unready until the Phase P3 Model Manager is implemented.
+transformers mode remains unready until RP-012 connects the loaded manager to
+the real generation service.
 
 ## Google Colab setup
 
@@ -85,15 +89,17 @@ The reproducible Phase P2 verification entry point is
 `notebooks/02_test_resume_parser.ipynb`. It generates only synthetic document
 fixtures and never uploads private resumes.
 
-Phase P3 begins with `notebooks/01_setup_colab.ipynb`. It installs the ML
+Phase P3 uses `notebooks/01_setup_colab.ipynb`. It installs the ML
 dependencies, configures an ephemeral Hugging Face cache, checks GPU/RAM/disk
 and package versions, performs a small bitsandbytes NF4 operation, and saves an
-explicit `supported_for_load_test` or `blocked` report. It does not download a
-checkpoint or silently switch to a smaller model.
+explicit `supported_for_load_test` or `blocked` report. After a passing decision,
+the RP-011 cells download the explicitly selected checkpoint, load it once with
+NF4, reject CPU/disk offload, print model metadata, and release GPU resources.
+The notebook never switches to a smaller model automatically.
 
-Do not install `requirements-ml.txt` for P0. When Phase P3 is reviewed and
-implemented, the Colab runtime must perform a GPU/resource preflight before real
-model loading. No public tunnel or always-on deployment is part of V1.
+Do not install `requirements-ml.txt` for mock-only work. A Colab runtime must
+pass the GPU/resource preflight before real model loading. No public tunnel or
+always-on deployment is part of V1.
 
 ## Configuration
 

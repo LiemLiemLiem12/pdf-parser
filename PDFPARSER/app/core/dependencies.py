@@ -6,6 +6,7 @@ from fastapi import Request
 from app.core.config import InferenceMode, Settings
 from app.core.exceptions import ModelNotReadyError
 from app.llm.contracts import Generator
+from app.llm.model_manager import ModelLoadError, ModelManager
 from app.services.document_service import DocumentService
 from app.services.llm_service import MockLLMService
 from app.services.parsing_service import ParsingService
@@ -14,8 +15,8 @@ from app.services.parsing_service import ParsingService
 class RuntimeState:
     """Mutable lifecycle state shared by controllers.
 
-    P3 will extend initialization with a ModelManager. Keeping state explicit
-    makes liveness independent from model readiness.
+    Keeping state explicit makes liveness independent from model readiness and
+    lets RP-012 reuse the model manager created during application startup.
     """
 
     ready: bool = False
@@ -24,8 +25,15 @@ class RuntimeState:
     generator: Generator | None = None
     parsing_service: ParsingService | None = None
     document_service: DocumentService | None = None
+    model_manager: ModelManager | None = None
+    model_metadata: dict[str, object] | None = None
 
-    def start(self, settings: Settings, generator: Generator | None = None) -> None:
+    def start(
+        self,
+        settings: Settings,
+        generator: Generator | None = None,
+        model_manager: ModelManager | None = None,
+    ) -> None:
         self.model_id = settings.resolved_model_id
         self.document_service = DocumentService(
             max_file_size_bytes=settings.max_file_size_bytes,
@@ -44,16 +52,29 @@ class RuntimeState:
             self.reason = "Mock inference is ready"
             return
 
+        self.model_manager = model_manager or ModelManager(settings)
+        try:
+            self.model_manager.load()
+        except ModelLoadError:
+            self.ready = False
+            self.reason = self.model_manager.failure_reason or "Real model initialization failed"
+            return
+
+        self.model_metadata = self.model_manager.metadata
         self.ready = False
-        self.reason = "Real model loading is not available until Phase P3"
+        self.reason = "Model loaded; Transformers generation is pending RP-012"
 
     def stop(self) -> None:
+        if self.model_manager is not None:
+            self.model_manager.close()
         self.ready = False
         self.reason = "Application is shutting down"
         self.model_id = None
         self.generator = None
         self.parsing_service = None
         self.document_service = None
+        self.model_manager = None
+        self.model_metadata = None
 
 
 def get_settings(request: Request) -> Settings:

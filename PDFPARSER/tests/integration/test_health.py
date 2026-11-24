@@ -4,6 +4,23 @@ from app.core.config import Settings
 from app.main import create_app
 
 
+class LoadedModelManager:
+    def __init__(self) -> None:
+        self.load_calls = 0
+        self.close_calls = 0
+        self.failure_reason = None
+        self.metadata = {
+            "alias": "qwen14b",
+            "model_id": "Qwen/Qwen2.5-14B-Instruct",
+        }
+
+    def load(self) -> None:
+        self.load_calls += 1
+
+    def close(self) -> None:
+        self.close_calls += 1
+
+
 def test_mock_app_is_live_and_ready_with_request_id() -> None:
     app = create_app(Settings(_env_file=None))
 
@@ -26,7 +43,7 @@ def test_mock_app_is_live_and_ready_with_request_id() -> None:
     }
 
 
-def test_real_mode_is_live_but_not_ready_before_phase_p3() -> None:
+def test_real_mode_is_live_but_not_ready_when_model_initialization_fails() -> None:
     settings = Settings(
         _env_file=None,
         inference_mode="transformers",
@@ -46,9 +63,33 @@ def test_real_mode_is_live_but_not_ready_before_phase_p3() -> None:
         "status": "error",
         "error": {
             "code": "MODEL_NOT_READY",
-            "message": "Real model loading is not available until Phase P3",
+            "message": "Model initialization failed (ModelLoadError)",
         },
     }
+
+
+def test_loaded_manager_is_created_once_and_released_by_lifespan() -> None:
+    settings = Settings(
+        _env_file=None,
+        inference_mode="transformers",
+        model_alias="qwen14b",
+        quantization="nf4-4bit",
+    )
+    manager = LoadedModelManager()
+    app = create_app(settings, model_manager=manager)  # type: ignore[arg-type]
+
+    with TestClient(app, raise_server_exceptions=False) as client:
+        first = client.get("/api/v1/ready")
+        second = client.get("/api/v1/ready")
+        assert app.state.runtime.model_metadata == manager.metadata
+
+    assert first.status_code == 503
+    assert second.status_code == 503
+    assert first.json()["error"]["message"] == (
+        "Model loaded; Transformers generation is pending RP-012"
+    )
+    assert manager.load_calls == 1
+    assert manager.close_calls == 1
 
 
 def test_unknown_route_uses_consistent_error_contract() -> None:

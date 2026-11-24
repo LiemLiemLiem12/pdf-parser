@@ -19,6 +19,7 @@ from app.core.dependencies import RuntimeState
 from app.core.exceptions import AppError
 from app.core.logging import configure_logging
 from app.llm.contracts import Generator
+from app.llm.model_manager import ModelManager
 
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,7 @@ def create_app(
     settings: Settings | None = None,
     *,
     generator: Generator | None = None,
+    model_manager: ModelManager | None = None,
 ) -> FastAPI:
     """Build an isolated application instance.
 
@@ -74,7 +76,11 @@ def create_app(
             "application_starting",
             extra={"inference_mode": app_settings.inference_mode.value},
         )
-        runtime.start(app_settings, generator=generator)
+        runtime.start(
+            app_settings,
+            generator=generator,
+            model_manager=model_manager,
+        )
         try:
             yield
         finally:

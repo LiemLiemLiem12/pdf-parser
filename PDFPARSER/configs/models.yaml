@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "models": {
+    "qwen7b": {
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "quantizations": ["nf4-4bit"]
+    },
+    "qwen14b": {
+      "model_id": "Qwen/Qwen2.5-14B-Instruct",
+      "quantizations": ["nf4-4bit"]
+    },
+    "qwen72b": {
+      "model_id": "Qwen/Qwen2.5-72B-Instruct",
+      "quantizations": ["nf4-4bit"]
+    }
+  }
+}

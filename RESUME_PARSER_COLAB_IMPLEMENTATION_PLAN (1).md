@@ -456,13 +456,13 @@ Implement and test phases in order. Do not add future-phase dependencies in anti
 **Depends on:** RP-009.  
 **Files:** `notebooks/01_setup_colab.ipynb`, requirements files, model configuration.
 
-- [ ] Select a GPU runtime in Colab. Clone the repository to `/content/` and install dependencies from the repository.
-- [ ] Inspect `nvidia-smi`, available VRAM, system RAM and disk space. Record Python, CUDA, PyTorch and Transformers versions.
-- [ ] Check that the selected GPU and installed bitsandbytes version support the configured quantization and compute dtype.
-- [ ] Configure the Hugging Face cache under the Colab runtime; optionally use a private persistent cache if capacity permits. Do not duplicate checkpoints unnecessarily.
-- [ ] Use Colab Secrets only when an access token is needed. Never print credentials or embed them in a notebook.
-- [ ] Mount Google Drive only for authorized research data and result persistence. Use synthetic or consented/de-identified resumes.
-- [ ] Refuse real-mode startup if hardware is inadequate. Test Qwen14B first; explicitly select the 7B fallback only if needed.
+- [x] Select a GPU runtime in Colab. Clone the repository to `/content/` and install dependencies from the repository.
+- [x] Inspect `nvidia-smi`, available VRAM, system RAM and disk space. Record Python, CUDA, PyTorch and Transformers versions.
+- [x] Check that the selected GPU and installed bitsandbytes version support the configured quantization and compute dtype.
+- [x] Configure the Hugging Face cache under the Colab runtime; optionally use a private persistent cache if capacity permits. Do not duplicate checkpoints unnecessarily.
+- [x] Use Colab Secrets only when an access token is needed. Never print credentials or embed them in a notebook.
+- [x] Mount Google Drive only for authorized research data and result persistence. Use synthetic or consented/de-identified resumes.
+- [x] Refuse real-mode startup if hardware is inadequate. Test Qwen14B first; explicitly select the 7B fallback only if needed.
 
 **Acceptance:** notebook reports actual resource availability and dependency versions; GPU preflight produces an explicit supported/blocked decision. No paid resource or automatic model substitution is used.
 
@@ -471,14 +471,14 @@ Implement and test phases in order. Do not add future-phase dependencies in anti
 **Depends on:** RP-010, RP-005.  
 **Files:** `llm/model_manager.py`, `llm/model_config.py`, `configs/models.yaml`.
 
-- [ ] Implement model configuration resolution by allowlisted alias.
-- [ ] Use `AutoTokenizer.from_pretrained` and `AutoModelForCausalLM.from_pretrained` with explicit model revision for recorded experiments.
-- [ ] Use `BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", ...)`, with compute dtype selected from hardware capabilities. Use FP16 compute on a suitable T4; use BF16 only if supported and verified.
-- [ ] Use Accelerate device placement, verify where modules are placed and reject unintended CPU/disk offload for the GPU-only baseline.
-- [ ] Call `model.eval()`; model is for inference only.
+- [x] Implement model configuration resolution by allowlisted alias.
+- [x] Use `AutoTokenizer.from_pretrained` and `AutoModelForCausalLM.from_pretrained` with explicit model revision for recorded experiments.
+- [x] Use `BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", ...)`, with compute dtype selected from hardware capabilities. Use FP16 compute on a suitable T4; use BF16 only if supported and verified.
+- [x] Use Accelerate device placement, verify where modules are placed and reject unintended CPU/disk offload for the GPU-only baseline.
+- [x] Call `model.eval()`; model is for inference only.
 - [ ] Load one model during FastAPI lifespan; inject the loaded Model Manager into LLM Service. No model initialization inside a request handler.
-- [ ] Expose readiness and configuration metadata; handle CUDA OOM and load errors without infinite retry.
-- [ ] On shutdown, release references and GPU resources where practical. Prefer a fresh process/runtime for benchmarking a different model.
+- [x] Expose readiness and configuration metadata; handle CUDA OOM and load errors without infinite retry.
+- [x] On shutdown, release references and GPU resources where practical. Prefer a fresh process/runtime for benchmarking a different model.
 
 **Implementation sketch** (adapt and verify against the runtime's installed versions):
 
@@ -791,8 +791,8 @@ Example prediction fields: `sample_id`, `status`, `model_id`, `schema_version`, 
 | RP-007 | Document Service | [ ] Implemented; dependency-backed extraction verification pending |
 | RP-008 | FastAPI Controller | [x] Completed; locally verified |
 | RP-009 | Mock end-to-end verification | [ ] Local verification complete; fresh Colab run pending |
-| RP-010 | Colab environment preflight | [ ] Implemented; execution on a fresh GPU runtime pending |
-| RP-011 | Model Manager | [ ] Planned |
+| RP-010 | Colab environment preflight | [x] Passed on a Colab GPU runtime (user-confirmed 2026-11-24) |
+| RP-011 | Model Manager | [ ] Implemented and locally tested; actual Colab checkpoint load pending |
 | RP-012 | Transformers LLM Service | [ ] Planned |
 | RP-013 | Real LLM end-to-end extraction | [ ] Planned |
 | RP-014 | Dataset and annotations | [ ] Planned |
