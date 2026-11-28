@@ -1,0 +1,218 @@
+{
+  "all_pair_audit": {
+    "negative": 605432,
+    "positive": 1691,
+    "positive_candidate": 19511,
+    "total_pairs": 2116293,
+    "uncertain": 1489659
+  },
+  "classification_rows": {
+    "test": 370,
+    "train": 4069,
+    "valid": 315
+  },
+  "entities": {
+    "inferred_job_categories": {
+      "ACCOUNTANT": 15,
+      "ADVOCATE": 68,
+      "AGRICULTURE": 6,
+      "APPAREL": 29,
+      "ARTS": 17,
+      "AUTOMOBILE": 7,
+      "AVIATION": 9,
+      "BANKING": 56,
+      "BUSINESS-DEVELOPMENT": 96,
+      "CHEF": 9,
+      "CONSTRUCTION": 28,
+      "CONSULTANT": 44,
+      "DESIGNER": 16,
+      "DIGITAL-MEDIA": 88,
+      "ENGINEERING": 35,
+      "FINANCE": 12,
+      "FITNESS": 4,
+      "HEALTHCARE": 88,
+      "HR": 55,
+      "INFORMATION-TECHNOLOGY": 41,
+      "PUBLIC-RELATIONS": 17,
+      "SALES": 106,
+      "TEACHER": 7
+    },
+    "job_splits": {
+      "test": 91,
+      "train": 671,
+      "valid": 91
+    },
+    "jobs": 853,
+    "resume_categories": {
+      "ACCOUNTANT": 118,
+      "ADVOCATE": 118,
+      "AGRICULTURE": 63,
+      "APPAREL": 97,
+      "ARTS": 103,
+      "AUTOMOBILE": 36,
+      "AVIATION": 116,
+      "BANKING": 115,
+      "BPO": 22,
+      "BUSINESS-DEVELOPMENT": 119,
+      "CHEF": 118,
+      "CONSTRUCTION": 112,
+      "CONSULTANT": 115,
+      "DESIGNER": 107,
+      "DIGITAL-MEDIA": 96,
+      "ENGINEERING": 118,
+      "FINANCE": 117,
+      "FITNESS": 117,
+      "HEALTHCARE": 115,
+      "HR": 110,
+      "INFORMATION-TECHNOLOGY": 120,
+      "PUBLIC-RELATIONS": 111,
+      "SALES": 116,
+      "TEACHER": 102
+    },
+    "resume_splits": {
+      "test": 252,
+      "train": 1977,
+      "valid": 252
+    },
+    "resumes": 2481
+  },
+  "format": "ConFit recruiting_data_v2",
+  "method": {
+    "critical_role_gate": [
+      [
+        "attorney",
+        "lawyer"
+      ],
+      [
+        "nurse",
+        "nursing",
+        "rn"
+      ],
+      [
+        "doctor",
+        "medical",
+        "physician"
+      ],
+      [
+        "pharmacist",
+        "pharmacy"
+      ],
+      [
+        "dental",
+        "dentist"
+      ],
+      [
+        "therapist",
+        "therapy"
+      ],
+      [
+        "accountant",
+        "accounting"
+      ],
+      [
+        "engineer",
+        "engineering"
+      ],
+      [
+        "developer",
+        "programmer",
+        "programming"
+      ],
+      [
+        "educator",
+        "teacher",
+        "teaching"
+      ],
+      [
+        "chef",
+        "cook",
+        "culinary"
+      ],
+      [
+        "aviation",
+        "pilot"
+      ],
+      [
+        "mechanic",
+        "mechanical"
+      ],
+      [
+        "architect",
+        "architecture"
+      ]
+    ],
+    "description": "Deterministic TF-IDF, skill overlap, and category-prototype pseudo-labeling",
+    "limitation": "Labels are pseudo-labels inferred from two independent Kaggle datasets; they are not real application or hiring outcomes.",
+    "score_weights": {
+      "category": 0.1,
+      "semantic": 0.45,
+      "skill": 0.25,
+      "title": 0.2
+    },
+    "seed": 42,
+    "tfidf": {
+      "documents": 3334,
+      "max_terms_per_document": 320,
+      "raw_terms": 60643,
+      "selected_features": 26465
+    },
+    "thresholds": {
+      "max_positives_per_job": 3,
+      "positive_aligned_category": 0.85,
+      "positive_category_evidence_semantic": 0.08,
+      "positive_category_evidence_skill": 0.25,
+      "positive_min_category": 0.65,
+      "positive_min_category_margin": 0.04,
+      "positive_min_semantic": 0.035,
+      "positive_min_total": 0.16,
+      "positive_strong_semantic": 0.15,
+      "positive_strong_title": 0.75
+    }
+  },
+  "ranking": {
+    "test_rank_job_groups": 76,
+    "test_rank_resume_groups": 57,
+    "valid_rank_job_groups": 68,
+    "valid_rank_resume_groups": 50
+  },
+  "selection": {
+    "jobs_with_positive": 657,
+    "resumes_with_positive": 782,
+    "selected_pairs": 4754,
+    "test_negative": 247,
+    "test_positive": 123,
+    "train_negative": 2603,
+    "train_positive": 1466,
+    "valid_negative": 213,
+    "valid_positive": 102
+  },
+  "source": {
+    "job_csv": "C:\\Users\\thuyd\\OneDrive\\Desktop\\Development\\KLTN\\ATS-CV\\RESUME-MATCHING\\ConFit-v2\\dataset\\Kaggle\\training_data.csv",
+    "job_stats": {
+      "output_rows": 853,
+      "source_rows": 853
+    },
+    "resume_csv": "C:\\Users\\thuyd\\OneDrive\\Desktop\\Development\\KLTN\\ATS-CV\\RESUME-MATCHING\\ConFit-v2\\dataset\\Kaggle\\Resume.csv",
+    "resume_stats": {
+      "duplicate_text_removed": 2,
+      "empty_removed": 1,
+      "output_rows": 2481,
+      "source_rows": 2484
+    }
+  },
+  "validation": {
+    "classification_rows": {
+      "test": 370,
+      "train": 4069,
+      "valid": 315
+    },
+    "job_rows": 853,
+    "ranking_groups": {
+      "rank_job.json": 76,
+      "rank_resume.json": 57,
+      "valid_rank_job.json": 68,
+      "valid_rank_resume.json": 50
+    },
+    "resume_rows": 2481
+  }
+}
