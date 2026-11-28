@@ -5,11 +5,11 @@ from src.preprocess.flatten import flatten_dict
 # You can use a smaller length of job to save memory if you don't use hypothetical resume (concat with original job)
 
 _max_seq_len_per_resume_feature = {
-    "text_resume": 2000
+    "text_resume": 768
 }
 
 _max_seq_len_per_job_feature = {
-    "text_job":3200
+    "text_job":512
     }
 
 
