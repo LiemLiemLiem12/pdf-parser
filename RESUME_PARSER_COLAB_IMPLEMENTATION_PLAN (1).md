@@ -546,7 +546,7 @@ flowchart TD
 ### RP-013 — Real end-to-end extraction in Colab
 
 **Depends on:** RP-012, RP-009.  
-**Files:** `notebooks/02_test_resume_parser.ipynb`, integration tests and smoke artifacts.
+**Files:** `notebooks/03_test_real_api.ipynb`, integration tests and smoke artifacts.
 
 - [ ] Start a real-model app through FastAPI lifespan in the notebook; do not load the same model a second time for testing.
 - [ ] Send one text request, one PDF request, one DOCX request and one sparse or multilingual resume request using TestClient.

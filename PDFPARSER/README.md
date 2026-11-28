@@ -99,6 +99,12 @@ the RP-011 cells download the explicitly selected checkpoint, load it once with
 NF4, reject CPU/disk offload, print model metadata, and release GPU resources.
 The notebook never switches to a smaller model automatically.
 
+After starting one real-model Uvicorn process in a separate Colab terminal,
+run `notebooks/03_test_real_api.ipynb` to exercise live health, readiness,
+English, multilingual, sparse, PDF, DOCX, and request-validation cases. The
+notebook uses synthetic data and writes its run summary to
+`artifacts/rp013/live_api_smoke.json`.
+
 Do not install `requirements-ml.txt` for mock-only work. A Colab runtime must
 pass the GPU/resource preflight before real model loading. No public tunnel or
 always-on deployment is part of V1.
